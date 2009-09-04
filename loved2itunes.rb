@@ -31,7 +31,7 @@
 #   sudo gem install nokogiri
 #   sudo gem install rb-appscript
 
-PVERSION = "Version 1.0, 09/10/2008"
+PVERSION = "Version 1.0, 9/5/2009"
 
 $KCODE = "u"
 
