@@ -37,7 +37,7 @@ begin
   require 'appscript'
   require 'open-uri'
 
-  username      = ARGV[0] || 'kain82'
+  username      = ARGV[0]
   playlist_name = ARGV[1] || 'Loved'
   api_key       = ARGV[2] || API_KEY
 
@@ -65,7 +65,7 @@ begin
     title = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
     artist = loved_track.search('name')[1].inner_html.to_s
     # Get a reference to the existing track from the main library.
-    track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.contains(title))] 
+    track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title))] 
 
     if track_ref.exists
       iTunes.add(track_ref.location.get, :to => playlist) # Finally add the track to our playlist.
