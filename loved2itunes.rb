@@ -38,7 +38,7 @@ begin
   require 'open-uri'
   include Appscript
 
-  username       = ARGV[0]
+  username       = ARGV[0] || 'kain82'
   playlist_name  = ARGV[1] || 'Loved'
   include_videos = ARGV[2] || 't'
   api_key        = ARGV[3] || API_KEY
@@ -72,7 +72,7 @@ begin
     if include_videos == 't'
       track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.name.eq(title))]
     else
-      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.video_kind.eq(:none)).and(its.podcast.eq(false)).and(its.name.eq(title))]
+      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.name.eq(title)).and(its.video_kind.eq(:none)).and(its.podcast.eq(false))]
     end
 
     # Check it track exists.

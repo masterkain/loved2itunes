@@ -32,7 +32,7 @@ Also note that when you have duplicates, the script will put them all in your pl
 This script is ideal to keep in sync with your last.fm loved tracks.
 For example this will run hourly:
 
-    01 * * * * /path/to/loved2itunes.rb >/dev/null 2>&1
+    01 * * * * /path/to/loved2itunes.rb username >/dev/null 2>&1
 
 ## Tips
 
