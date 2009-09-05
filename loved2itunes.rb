@@ -43,7 +43,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'appscript'
 
-username      = ARGV.first || "kain82"
+username      = ARGV.first
 playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
@@ -71,7 +71,6 @@ begin
     # Get a reference to the existing track, it may be more robust in future.
     track_ref = iTunes.library_playlists[1].tracks[title]
     # Finally add the track to our playlist.
-    # p iTunes.library_playlists.get.flatten
     iTunes.add(track_ref.location.get, :to => playlist) if track_ref.exists
   end
   p "Tracks imported into '#{playlist_name}' playlist."
