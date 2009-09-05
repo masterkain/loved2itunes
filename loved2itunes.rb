@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 #--
 # Copyright (c) 2009 Claudio Poli
 #
@@ -31,8 +32,10 @@
 #   sudo gem install nokogiri
 #   sudo gem install rb-appscript
 
-PVERSION = "Version 1.0, 9/5/2009"
+# Using the api keys found in the docs, replace with yours if you feel.
+API_KEY = "b25b959554ed76058ac220b7b2e0a026"
 
+PVERSION = "Version 1.0, 9/5/2009"
 $KCODE = "u"
 
 require 'rubygems'
@@ -40,12 +43,13 @@ require 'open-uri'
 require 'nokogiri'
 require 'appscript'
 
-username      = ARGV.first
+username      = ARGV.first || "kain82"
 playlist_name = ARGV[1] || 'Loved'
+api_key       = ARGV[2] || API_KEY
 
 begin
-  # Using the api keys found in the docs, replace with yours if you feel.
-  url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{username}&api_key=b25b959554ed76058ac220b7b2e0a026&limit=0"
+  p "lastfm2itunes #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
+  url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{username}&api_key=#{api_key}&limit=0"
   doc = Nokogiri::XML(open(url))
   # XPath selection, can be vastly improved.
   loved_tracks = (doc/'//lovedtracks')./('track')
@@ -60,14 +64,17 @@ begin
   # Reset playlist.
   playlist.tracks.get.each{ |tr| tr.delete } if playlist.tracks.get.size.to_i > 0
 
+  p "Found #{loved_tracks.size} loved tracks, importing..."
   loved_tracks.each do |loved_track|
     # Grab the name of the loved track.
     title = loved_track.search('name')[0].inner_html.to_s
     # Get a reference to the existing track, it may be more robust in future.
     track_ref = iTunes.library_playlists[1].tracks[title]
     # Finally add the track to our playlist.
+    # p iTunes.library_playlists.get.flatten
     iTunes.add(track_ref.location.get, :to => playlist) if track_ref.exists
   end
+  p "Tracks imported into '#{playlist_name}' playlist."
 rescue Exception => e
   puts "Something was wrong: #{e.message}"
 end
