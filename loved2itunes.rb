@@ -63,7 +63,7 @@ class ParseOptions
       opts.separator "Specific options:"
 
       opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Loved' will be used instead.") { |n| options.playlist_name = n }
-      opts.on("-nv", "--no_video", "If present specifies to exclude videos (thus slowing operations).") { |i| options.no_video = i }
+      opts.on("-e", "--exclude_video", "If present specifies to exclude videos (thus slowing operations).") { |i| options.no_video = i }
       opts.on("-a", "--api_key=key", String, "Specifies the last.fm api key for the script to operate.") { |a| options.api_key = a }
       opts.on("-l", "--limit=name", Integer, "Specifies how many tracks you want to fetch.") { |l| options.limit = l }
       opts.on("-v", "--[no-]verbose", "Run verbosely") { |v| options.verbose = v }

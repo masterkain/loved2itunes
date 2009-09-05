@@ -8,9 +8,9 @@ This Ruby script creates or overrides an iTunes playlist containing your loved l
 
 ## Examples
 
-    ruby loved2itunes.rb -u kain82 -n MyLovedTracks --nv # will import loved tracks into MyLovedTracks playlist and excludes videos.
+    ruby loved2itunes.rb -u kain82 -n MyLovedTracks -e # will import loved tracks into MyLovedTracks playlist and excludes videos.
     ruby loved2itunes.rb -u kain82 # will import loved tracks into Loved playlist and includes videos.
-    ruby loved2itunes.rb -u kain82 -nv -v # run verbosely, exclude videos
+    ruby loved2itunes.rb -u kain82 -e -v # run verbosely, exclude videos
 
 ## Cronjob
 
