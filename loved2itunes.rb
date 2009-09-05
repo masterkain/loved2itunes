@@ -24,7 +24,7 @@
 
 API_KEY = "b25b959554ed76058ac220b7b2e0a026"
 
-PVERSION = "Version 1.1, 09/05/2009"
+PVERSION = "1.2"
 $KCODE = "u"
 
 begin
@@ -37,43 +37,42 @@ begin
   require 'appscript'
   require 'open-uri'
 
-  username      = ARGV[0]
+  username      = ARGV[0] || 'kain82'
   playlist_name = ARGV[1] || 'Loved'
   api_key       = ARGV[2] || API_KEY
 
   raise("please specify a username") if username.nil?
-  p "loved2itunes: #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
+
+  puts "loved2itunes: #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
+
   url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username.downcase)}&api_key=#{api_key}&limit=0"
   doc = Nokogiri::XML(open(url))
-  # XPath selection.
-  loved_tracks = (doc/'//lovedtracks/track')
+  loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
 
-  # get iTunes reference.
-  iTunes = Appscript.app("iTunes.app")
-  # run iTunes unless if it's already running.
-  iTunes.run unless iTunes.is_running?
+  iTunes = Appscript.app("iTunes.app") # get iTunes reference.
+  iTunes.run unless iTunes.is_running? # run iTunes unless if it's already running.
 
   # Check if the playlist already exists, if it does, create a new one with the name provided.
   playlist = iTunes.playlists[playlist_name].exists ? iTunes.playlists[playlist_name] : iTunes.make(:new => :user_playlist, :with_properties => { :name => playlist_name })
-  # Reset playlist.
-  playlist.tracks.get.each{ |tr| tr.delete } if playlist.tracks.get.size.to_i > 0
 
-  p "loved2itunes: found #{loved_tracks.size} loved tracks, importing..."
+  playlist.tracks.get.each{ |tr| tr.delete } if playlist.tracks.get.size.to_i > 0 # Reset playlist.
+
+  puts "loved2itunes: found <#{loved_tracks.size}> loved tracks, importing..."
+
   counter = 0
   loved_tracks.each do |loved_track|
-    # Grab the name of the loved track.
-    title = loved_track.search('name')[0].inner_html.to_s
-    # Get a reference to the existing track, it may be more robust in future.
-    track_ref = iTunes.library_playlists[1].tracks[title]
-    # Finally add the track to our playlist.
+    title = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
+    track_ref = iTunes.library_playlists[1].tracks[title] # Get a reference to the existing track.
+
     if track_ref.exists
-      iTunes.add(track_ref.location.get, :to => playlist)
+      iTunes.add(track_ref.location.get, :to => playlist) # Finally add the track to our playlist.
       counter += 1
     else
-      p "loved2itunes: track not found, skipping #{title}"
+      p "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
     end
   end
-  p "loved2itunes: #{counter}/#{loved_tracks.size} tracks imported into '#{playlist_name}' playlist."
+
+  puts "loved2itunes: <#{counter}/#{loved_tracks.size}> tracks imported into '#{playlist_name}' playlist."
 rescue Exception => e
   puts "loved2itunes: something went wrong, the error message is: #{e.message}"
 ensure
