@@ -22,17 +22,6 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #++
 
-# Create or override a new playlist from your loved last.fm tracks to iTunes.
-# Tested on Snow Leopard.
-
-# Usage:
-#   ruby loved2itunes.rb username playlist_name
-
-# You need to install Xcode and two gems:
-#   sudo gem install nokogiri
-#   sudo gem install rb-appscript
-
-# Using the api keys found in the docs, replace with yours if you feel.
 API_KEY = "b25b959554ed76058ac220b7b2e0a026"
 
 PVERSION = "Version 1.0, 9/5/2009"
@@ -43,7 +32,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'appscript'
 
-username      = ARGV.first || "kain82"
+username      = ARGV[0]
 playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
