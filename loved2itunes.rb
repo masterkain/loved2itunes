@@ -141,7 +141,7 @@ begin
       iTunes = WIN32OLE.new('iTunes.Application')
 
       # Destroy and recreate playlist.
-      iTunes.LibrarySource.Playlists.ItemByName(options.playlist_name).delete
+      iTunes.LibrarySource.Playlists.ItemByName(options.playlist_name).delete rescue nil
       playlist = iTunes.CreatePlaylist(options.playlist_name)
 
       puts "loved2itunes Win: found <#{loved_tracks.size}> loved tracks, trying to import..." if options.verbose
