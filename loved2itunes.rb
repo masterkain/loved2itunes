@@ -43,7 +43,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'appscript'
 
-username      = ARGV.first
+username      = ARGV.first || "kain82"
 playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
@@ -65,15 +65,21 @@ begin
   playlist.tracks.get.each{ |tr| tr.delete } if playlist.tracks.get.size.to_i > 0
 
   p "Found #{loved_tracks.size} loved tracks, importing..."
+  counter = 0
   loved_tracks.each do |loved_track|
     # Grab the name of the loved track.
     title = loved_track.search('name')[0].inner_html.to_s
     # Get a reference to the existing track, it may be more robust in future.
     track_ref = iTunes.library_playlists[1].tracks[title]
     # Finally add the track to our playlist.
-    iTunes.add(track_ref.location.get, :to => playlist) if track_ref.exists
+     if track_ref.exists
+       iTunes.add(track_ref.location.get, :to => playlist)
+       counter += 1
+     else
+       p "Track not found, skipped: #{title}"
+     end
   end
-  p "Tracks imported into '#{playlist_name}' playlist."
+  p "#{counter}/#{loved_tracks.size} tracks imported into '#{playlist_name}' playlist."
 rescue Exception => e
   puts "Something was wrong: #{e.message}"
 end
