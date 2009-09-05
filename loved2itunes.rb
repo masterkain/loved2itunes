@@ -36,7 +36,7 @@ require 'pp'
 
 if RUBY_PLATFORM =~ /mswin|mingw/
   require 'win32ole'
-elsif PLATFORM =~ /darwin/
+elsif RUBY_PLATFORM =~ /darwin/
   require 'appscript'
 else
   raise("Unsupported operating system.")
