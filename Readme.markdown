@@ -17,7 +17,7 @@ This Ruby script creates or overrides an iTunes playlist containing your loved l
 This script is ideal to keep in sync with your last.fm loved tracks.
 For example this will run hourly:
 
-    01 * * * * /path/to/loved2itunes.rb -u username >/dev/null 2>&1
+    01 * * * * /path/to/loved2itunes.rb -u username
 
 ## Tips
 
