@@ -16,8 +16,10 @@ Install as follow:
 
     ruby loved2itunes.rb username [playlist_name] [include_videos] [api_key]
 
-Please note that api\_key and playlist\_name are optional, the latter, if not specified, will make the script use '__Loved__' as playlist name.
-Option include\_videos is a boolean and takes only 't' or 'f'. Actually the operation if much faster when including videos, due to iTunes taking its time to filter out video stuff.
+Please note that __api\_key__ and __playlist\_name__ are optional, the latter, if not specified, will make the script use '__Loved__' as playlist name.
+
+Option __include\_videos__ is a boolean and takes only 't' or 'f'. Actually the operation if much faster when including videos, due to iTunes taking its time to filter out video stuff.
+
 Also note that when you have duplicates, the script will put them all in your playlist, it can't check if the song is from a different album due to last.fm API limitations.
 
 ## Examples
@@ -30,7 +32,7 @@ Also note that when you have duplicates, the script will put them all in your pl
 This script is ideal to keep in sync with your last.fm loved tracks.
 For example this will run hourly:
 
-  01 * * * * /path/to/loved2itunes.rb >/dev/null 2>&1
+    01 * * * * /path/to/loved2itunes.rb >/dev/null 2>&1
 
 ## Resources
 
