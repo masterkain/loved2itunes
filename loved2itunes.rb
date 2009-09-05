@@ -63,7 +63,7 @@ class ParseOptions
       opts.separator "Specific options:"
 
       opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Loved' will be used instead.") { |n| options.playlist_name = n }
-      opts.on("-nv", "--no_video", "If present specifies to exclude videos (slowing operations).") { |i| options.no_video = i }
+      opts.on("-nv", "--no_video", "If present specifies to exclude videos (thus slowing operations).") { |i| options.no_video = i }
       opts.on("-a", "--api_key=key", String, "Specifies the last.fm api key for the script to operate.") { |a| options.api_key = a }
       opts.on("-l", "--limit=name", Integer, "Specifies how many tracks you want to fetch.") { |l| options.limit = l }
       opts.on("-v", "--[no-]verbose", "Run verbosely") { |v| options.verbose = v }
@@ -91,7 +91,7 @@ end # end class ParseOptions
 options = ParseOptions.parse(ARGV)
 begin
   if options.username.nil?
-    $stderr.puts "Please run '#{$0} -h' for help."
+    $stderr.puts "Missing username. Please run '#{$0} -h' for help."
     exit 1
   else
     puts "loved2itunes: #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..." if options.verbose
@@ -154,11 +154,12 @@ begin
         # Get a reference to the existing track from the main library.
         # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
         # this information.
-        if options.include_video
+        # FIXME: no effect on windows for now.
+        # if options.include_video
           track_ref = iTunes.LibraryPlaylist.Tracks.ItemByName(title) || nil
-        else
-          track_ref = iTunes.LibraryPlaylist.Tracks.ItemByName(title) || nil
-        end
+        #else
+        #  track_ref = iTunes.LibraryPlaylist.Tracks.ItemByName(title) || nil
+        #end
         # Check it track exists.
         unless track_ref.nil?
           playlist.AddTrack(track_ref) # Add the track to our playlist.
