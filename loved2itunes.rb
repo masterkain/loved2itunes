@@ -46,7 +46,7 @@ class ParseOptions
 
   def self.parse(args)
     options = OpenStruct.new
-    options.include_video = true
+    options.no_video      = false
     options.api_key       = API_KEY
     options.limit         = 0
     options.playlist_name = 'Loved'
@@ -63,7 +63,7 @@ class ParseOptions
       opts.separator "Specific options:"
 
       opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Loved' will be used instead.") { |n| options.playlist_name = n }
-      opts.on("-i", "--include_video", "Specifies to include videos (fast) or not (slow).") { |i| options.include_video = i }
+      opts.on("-nv", "--no_video", "If present specifies to exclude videos (slowing operations).") { |i| options.no_video = i }
       opts.on("-a", "--api_key=key", String, "Specifies the last.fm api key for the script to operate.") { |a| options.api_key = a }
       opts.on("-l", "--limit=name", Integer, "Specifies how many tracks you want to fetch.") { |l| options.limit = l }
       opts.on("-v", "--[no-]verbose", "Run verbosely") { |v| options.verbose = v }
@@ -119,10 +119,10 @@ begin
         # Get a reference to the existing track from the main library.
         # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
         # this information.
-        if options.include_video
-          track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title))]
-        else
+        if options.no_video
           track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title)).and(whose.video_kind.eq(:none)).and(whose.podcast.eq(false))]
+        else
+          track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title))]
         end
 
         # Check it track exists.
@@ -145,7 +145,6 @@ begin
       playlist = iTunes.CreatePlaylist(options.playlist_name)
 
       puts "loved2itunes Win: found <#{loved_tracks.size}> loved tracks, trying to import..." if options.verbose
-
 
       counter, success, skipped = 0, 0, 0
       loved_tracks.each do |loved_track|
