@@ -24,22 +24,26 @@
 
 API_KEY = "b25b959554ed76058ac220b7b2e0a026"
 
-PVERSION = "Version 1.0, 9/5/2009"
+PVERSION = "Version 1.1, 09/05/2009"
 $KCODE = "u"
 
 require 'rubygems'
-require 'open-uri'
+
+gem 'nokogiri', '>= 1.3.3'
+gem 'appscript', '>= 0.5.3'
+
 require 'nokogiri'
 require 'appscript'
+require 'open-uri'
 
-username      = ARGV[0]
+username      = ARGV[0] || "kain82"
 playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
 begin
   raise("Please specify a username") if username.nil?
   p "lastfm2itunes #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
-  url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username)}&api_key=#{api_key}&limit=0"
+  url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username.downcase)}&api_key=#{api_key}&limit=0"
   doc = Nokogiri::XML(open(url))
   # XPath selection.
   loved_tracks = (doc/'//lovedtracks/track')
