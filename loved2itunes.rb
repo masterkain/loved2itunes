@@ -23,71 +23,156 @@
 #++
 
 API_KEY = "b25b959554ed76058ac220b7b2e0a026"
+PVERSION = "1.4"
 
-PVERSION = "1.3"
 $KCODE = "u"
 
-begin
-  require 'rubygems'
+require 'rubygems'
+require 'open-uri'
+require 'nokogiri'
+require 'optparse'
+require 'ostruct'
+require 'pp'
 
-  gem 'nokogiri', '>= 1.3.3'
-  gem 'rb-appscript', '>= 0.5.3'
-
-  require 'nokogiri'
+if RUBY_PLATFORM =~ /mswin|mingw/
+  require 'win32ole'
+elsif PLATFORM =~ /darwin/
   require 'appscript'
-  require 'open-uri'
-  include Appscript
+else
+  raise("Unsupported operating system.")
+end
 
-  username       = ARGV[0]
-  playlist_name  = ARGV[1] || 'Loved'
-  include_videos = ARGV[2] || 't'
-  api_key        = ARGV[3] || API_KEY
+class ParseOptions
 
-  raise("please specify a username") if username.nil?
+  def self.parse(args)
+    options = OpenStruct.new
+    options.include_video = true
+    options.api_key       = API_KEY
+    options.limit         = 0
+    options.playlist_name = 'Loved'
 
-  puts "loved2itunes: #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
+    opts = OptionParser.new do |opts|
+      opts.banner = "Usage: #{$0} [options]"
 
-  url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username.downcase)}&api_key=#{api_key}&limit=0"
-  doc = Nokogiri::XML(open(url))
-  loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
+      opts.separator " "
+      opts.separator "Mandatory options:"
 
-  iTunes = app("iTunes.app") # get iTunes reference.
-  iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
+      opts.on("-u", "--username=name", String, "Specifies the last.fm username for the script to operate on.") { |u| options.username = u }
 
-  # Check if the playlist already exists, if it does, create a new one with the name provided.
-  playlist = iTunes.playlists[playlist_name].exists ? iTunes.playlists[playlist_name] : iTunes.make(:new => :user_playlist, :with_properties => { :name => playlist_name })
+      opts.separator " "
+      opts.separator "Specific options:"
 
-  playlist.tracks.get.each{ |tr| tr.delete } # Reset playlist.
+      opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Loved' will be used instead.") { |n| options.playlist_name = n }
+      opts.on("-i", "--include_video", "Specifies to include videos (fast) or not (slow).") { |i| options.include_video = i }
+      opts.on("-a", "--api_key=key", String, "Specifies the last.fm api key for the script to operate.") { |a| options.api_key = a }
+      opts.on("-l", "--limit=name", Integer, "Specifies how many tracks you want to fetch.") { |l| options.limit = l }
+      opts.on("-v", "--[no-]verbose", "Run verbosely") { |v| options.verbose = v }
 
-  puts "loved2itunes: found <#{loved_tracks.size}> loved tracks, importing..."
+      opts.separator " "
 
-  counter, success, skipped = 0, 0, 0
-  loved_tracks.each do |loved_track|
-    counter += 1
-    title = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
-    artist = loved_track.search('name')[1].inner_html.to_s # Grab the artist of the loved track.
-    # Get a reference to the existing track from the main library.
-    # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
-    # this information.
-    if include_videos == 't'
-      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.name.eq(title))]
+      opts.separator "Common options:"
+      opts.on_tail("-h", "--help", "Show this message") do
+        puts opts
+        exit
+      end
+
+      opts.on_tail("--version", "Show version") do
+        puts PVERSION
+        exit
+      end
+    end # end OptionParser
+
+    opts.parse!(args)
+    options
+  end # end parse()
+
+end # end class ParseOptions
+
+options = ParseOptions.parse(ARGV)
+begin
+  if options.username.nil?
+    $stderr.puts "Please run '#{$0} -h' for help."
+    exit 1
+  else
+    puts "loved2itunes: #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..." if options.verbose
+
+    url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(options.username.downcase)}&api_key=#{options.api_key}&limit=0"
+    doc = Nokogiri::XML(open(url))
+    loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
+
+    if PLATFORM =~ /darwin/
+      # Operating on Macintosh.
+      iTunes = Appscript.app("iTunes.app") # get iTunes reference.
+      iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
+
+      # Check if the playlist already exists, if it does, create a new one with the name provided.
+      playlist = iTunes.playlists[options.playlist_name].exists ? iTunes.playlists[options.playlist_name] : iTunes.make(:new => :user_playlist, :with_properties => { :name => options.playlist_name })
+      playlist.tracks.get.each{ |tr| tr.delete } # Reset playlist.
+
+      puts "loved2itunes Mac: found <#{loved_tracks.size}> loved tracks, trying to import..." if options.verbose
+
+      counter, success, skipped, whose = 0, 0, 0, Appscript.its
+      loved_tracks.each do |loved_track|
+        counter += 1
+        title  = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
+        artist = loved_track.search('name')[1].inner_html.to_s # Grab the artist of the loved track.
+        # Get a reference to the existing track from the main library.
+        # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
+        # this information.
+        if options.include_video
+          track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title))]
+        else
+          track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title)).and(whose.video_kind.eq(:none)).and(whose.podcast.eq(false))]
+        end
+
+        # Check it track exists.
+        if track_ref.exists
+          iTunes.add(track_ref.location.get, :to => playlist) # Add the track to our playlist.
+          success += 1
+        else
+          puts "loved2itunes Mac: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>" if options.verbose
+          skipped += 1
+        end
+      end
+      puts "loved2itunes Mac: <#{success}/#{loved_tracks.size}> tracks imported into '#{options.playlist_name}' playlist, #{skipped} skipped" if options.verbose
+
     else
-      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.name.eq(title)).and(its.video_kind.eq(:none)).and(its.podcast.eq(false))]
+      # Operating on Windows.
+      iTunes = WIN32OLE.new('iTunes.Application')
+
+      # Destroy and recreate playlist.
+      iTunes.LibrarySource.Playlists.ItemByName(options.playlist_name).delete
+      playlist = iTunes.CreatePlaylist(options.playlist_name)
+
+      puts "loved2itunes Win: found <#{loved_tracks.size}> loved tracks, trying to import..." if options.verbose
+
+
+      counter, success, skipped = 0, 0, 0
+      loved_tracks.each do |loved_track|
+        counter += 1
+        title  = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
+        artist = loved_track.search('name')[1].inner_html.to_s # Grab the artist of the loved track.
+        # Get a reference to the existing track from the main library.
+        # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
+        # this information.
+        if options.include_video
+          track_ref = iTunes.LibraryPlaylist.Tracks.ItemByName(title) || nil
+        else
+          track_ref = iTunes.LibraryPlaylist.Tracks.ItemByName(title) || nil
+        end
+        # Check it track exists.
+        unless track_ref.nil?
+          playlist.AddTrack(track_ref) # Add the track to our playlist.
+          success += 1
+        else
+          puts "loved2itunes Win: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>" if options.verbose
+          skipped += 1
+        end
+      end
+      puts "loved2itunes Win: <#{success}/#{loved_tracks.size}> tracks imported into '#{options.playlist_name}' playlist, #{skipped} skipped" if options.verbose
+
     end
 
-    # Check it track exists.
-    if track_ref.exists
-      iTunes.add(track_ref.location.get, :to => playlist) # Add the track to our playlist.
-      success += 1
-    else
-      puts "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
-      skipped += 1
-    end
   end
 
-  puts "loved2itunes: <#{success}/#{loved_tracks.size}> tracks imported into '#{playlist_name}' playlist, #{skipped} skipped"
-rescue Exception => e
-  puts "loved2itunes: something went wrong, the error message is: #{e.message}"
-ensure
-  puts "loved2itunes: execution finished."
 end
