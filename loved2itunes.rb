@@ -37,7 +37,7 @@ begin
   require 'appscript'
   require 'open-uri'
 
-  username      = ARGV[0] || 'kain82'
+  username      = ARGV[0]
   playlist_name = ARGV[1] || 'Loved'
   api_key       = ARGV[2] || API_KEY
 
