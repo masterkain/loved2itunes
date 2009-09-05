@@ -37,6 +37,7 @@ playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
 begin
+  raise("Please specify a username") if username.nil?
   p "lastfm2itunes #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
   url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username)}&api_key=#{api_key}&limit=0"
   doc = Nokogiri::XML(open(url))
