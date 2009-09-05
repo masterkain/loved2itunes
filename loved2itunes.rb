@@ -24,7 +24,7 @@
 
 API_KEY = "b25b959554ed76058ac220b7b2e0a026"
 
-PVERSION = "1.2"
+PVERSION = "1.3"
 $KCODE = "u"
 
 begin
@@ -61,9 +61,9 @@ begin
 
   puts "loved2itunes: found <#{loved_tracks.size}> loved tracks, importing..."
 
-  counter = 0
-
+  counter, success, skipped = 0, 0, 0
   loved_tracks.each do |loved_track|
+    counter += 1
     title = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
     artist = loved_track.search('name')[1].inner_html.to_s # Grab the artist of the loved track.
     # Get a reference to the existing track from the main library.
@@ -78,13 +78,14 @@ begin
     # Check it track exists.
     if track_ref.exists
       iTunes.add(track_ref.location.get, :to => playlist) # Add the track to our playlist.
-      counter += 1
+      success += 1
     else
       p "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
+      skipped += 1
     end
   end
 
-  puts "loved2itunes: <#{counter}/#{loved_tracks.size}> tracks imported into '#{playlist_name}' playlist."
+  puts "loved2itunes: <#{success}/#{loved_tracks.size}> tracks imported into '#{playlist_name}' playlist, #{skipped} skipped"
 rescue Exception => e
   puts "loved2itunes: something went wrong, the error message is: #{e.message}"
 ensure

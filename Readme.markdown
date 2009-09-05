@@ -34,6 +34,10 @@ For example this will run hourly:
 
     01 * * * * /path/to/loved2itunes.rb >/dev/null 2>&1
 
+## Tips
+
+You can also use another last.fm username and try to import the loved tracks of another person/account if you have the required files in your library.
+
 ## Resources
 
 * [iCoreTech Research Labs](http://www.icoretech.org)
