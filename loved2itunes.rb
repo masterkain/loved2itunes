@@ -37,7 +37,7 @@ begin
   require 'appscript'
   require 'open-uri'
 
-  username      = ARGV[0]
+  username      = ARGV[0] || 'kain82'
   playlist_name = ARGV[1] || 'Loved'
   api_key       = ARGV[2] || API_KEY
 
@@ -50,7 +50,7 @@ begin
   loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
 
   iTunes = Appscript.app("iTunes.app") # get iTunes reference.
-  iTunes.run unless iTunes.is_running? # run iTunes unless if it's already running.
+  iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
 
   # Check if the playlist already exists, if it does, create a new one with the name provided.
   playlist = iTunes.playlists[playlist_name].exists ? iTunes.playlists[playlist_name] : iTunes.make(:new => :user_playlist, :with_properties => { :name => playlist_name })
