@@ -80,7 +80,7 @@ begin
       iTunes.add(track_ref.location.get, :to => playlist) # Add the track to our playlist.
       success += 1
     else
-      p "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
+      puts "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
       skipped += 1
     end
   end
