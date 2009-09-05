@@ -73,7 +73,7 @@ begin
       p "loved2itunes: track not found, skipping #{title}"
     end
   end
-  p "#{counter}/#{loved_tracks.size} tracks imported into '#{playlist_name}' playlist."
+  p "loved2itunes: #{counter}/#{loved_tracks.size} tracks imported into '#{playlist_name}' playlist."
 rescue Exception => e
   puts "loved2itunes: something went wrong, the error message is: #{e.message}"
 ensure
