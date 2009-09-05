@@ -38,7 +38,7 @@ begin
   require 'open-uri'
   include Appscript
 
-  username       = ARGV[0] || 'kain82'
+  username       = ARGV[0]
   playlist_name  = ARGV[1] || 'Loved'
   include_videos = ARGV[2] || 't'
   api_key        = ARGV[3] || API_KEY
