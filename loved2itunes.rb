@@ -30,13 +30,13 @@ $KCODE = "u"
 require 'rubygems'
 
 gem 'nokogiri', '>= 1.3.3'
-gem 'appscript', '>= 0.5.3'
+gem 'rb-appscript', '>= 0.5.3'
 
 require 'nokogiri'
 require 'appscript'
 require 'open-uri'
 
-username      = ARGV[0] || "kain82"
+username      = ARGV[0]
 playlist_name = ARGV[1] || 'Loved'
 api_key       = ARGV[2] || API_KEY
 
