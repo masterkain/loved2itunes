@@ -41,8 +41,8 @@ begin
   p "lastfm2itunes #{PVERSION} running on Ruby #{RUBY_VERSION} (#{RUBY_PLATFORM}), initializing..."
   url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=#{URI.escape(username)}&api_key=#{api_key}&limit=0"
   doc = Nokogiri::XML(open(url))
-  # XPath selection, can be vastly improved.
-  loved_tracks = (doc/'//lovedtracks')./('track')
+  # XPath selection.
+  loved_tracks = (doc/'//lovedtracks/track')
 
   # get iTunes reference.
   iTunes = Appscript.app("iTunes.app")
