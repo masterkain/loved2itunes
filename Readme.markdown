@@ -14,11 +14,19 @@ Install as follow:
 
 ## Usage
 
-    ruby loved2itunes.rb username [playlist_name] [api_key]
+    ruby loved2itunes.rb username [playlist_name] [include_videos] [api_key]
 
 Please note that api\_key and playlist\_name are optional, the latter, if not specified, will make the script use '__Loved__' as playlist name.
+Option include\_videos is a boolean and takes only 't' or 'f'. Actually the operation if much faster when including videos, due to iTunes taking its time to filter out video stuff.
+Also note that when you have duplicates, the script will put them all in your playlist, it can't check if the song is from a different album due to last.fm API limitations.
+
+## Examples
+
+    ruby loved2itunes.rb kain82 MyLovedTracks f # will import loved tracks into MyLovedTracks playlist and excludes videos.
+    ruby loved2itunes.rb kain82 Loved t # will import loved tracks into Loved playlist and includes videos.
 
 ## Resources
+
 * [iCoreTech Research Labs](http://www.icoretech.org)
 * [Original Announce](http://www.icoretech.org/2009/09/last-fm-loved-tracks-to-itunes/)
 * [last.fm Message](http://www.last.fm/forum/21716/_/448880/2#f10474933)

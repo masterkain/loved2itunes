@@ -36,10 +36,12 @@ begin
   require 'nokogiri'
   require 'appscript'
   require 'open-uri'
+  include Appscript
 
-  username      = ARGV[0]
-  playlist_name = ARGV[1] || 'Loved'
-  api_key       = ARGV[2] || API_KEY
+  username       = ARGV[0]
+  playlist_name  = ARGV[1] || 'Loved'
+  include_videos = ARGV[2] || 't'
+  api_key        = ARGV[3] || API_KEY
 
   raise("please specify a username") if username.nil?
 
@@ -49,26 +51,33 @@ begin
   doc = Nokogiri::XML(open(url))
   loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
 
-  iTunes = Appscript.app("iTunes.app") # get iTunes reference.
+  iTunes = app("iTunes.app") # get iTunes reference.
   iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
 
   # Check if the playlist already exists, if it does, create a new one with the name provided.
   playlist = iTunes.playlists[playlist_name].exists ? iTunes.playlists[playlist_name] : iTunes.make(:new => :user_playlist, :with_properties => { :name => playlist_name })
 
-  playlist.tracks.get.each{ |tr| tr.delete } if playlist.tracks.get.size.to_i > 0 # Reset playlist.
+  playlist.tracks.get.each{ |tr| tr.delete } # Reset playlist.
 
   puts "loved2itunes: found <#{loved_tracks.size}> loved tracks, importing..."
 
   counter = 0
-  whose = Appscript.its
+
   loved_tracks.each do |loved_track|
     title = loved_track.search('name')[0].inner_html.to_s # Grab the name of the loved track.
-    artist = loved_track.search('name')[1].inner_html.to_s
+    artist = loved_track.search('name')[1].inner_html.to_s # Grab the artist of the loved track.
     # Get a reference to the existing track from the main library.
-    track_ref = iTunes.library_playlists.first.tracks[whose.artist.eq(artist).and(whose.name.eq(title))] 
+    # This can return multiple references, sadly we can't check against album since last.fm APIs doesn't provide
+    # this information.
+    if include_videos == 't'
+      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.name.eq(title))]
+    else
+      track_ref = iTunes.library_playlists.first.tracks[its.artist.eq(artist).and(its.video_kind.eq(:none)).and(its.podcast.eq(false)).and(its.name.eq(title))]
+    end
 
+    # Check it track exists.
     if track_ref.exists
-      iTunes.add(track_ref.location.get, :to => playlist) # Finally add the track to our playlist.
+      iTunes.add(track_ref.location.get, :to => playlist) # Add the track to our playlist.
       counter += 1
     else
       p "loved2itunes: track <#{counter}/#{loved_tracks.size}> not found, skipping <#{title}>"
