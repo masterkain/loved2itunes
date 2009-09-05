@@ -35,9 +35,7 @@ You can also use another last.fm username and try to import the loved tracks of 
 
 Tested on Snow Leopard.
 
-Two gems are required in order to run loved2itunes, nokogiri and rb-appscript.
-
-You will need Xcode installed since those gems requires compilation.
+Two rubygems are required in order to run loved2itunes, nokogiri and rb-appscript.
 
 Open a terminal and issue those commands:
 
@@ -46,11 +44,13 @@ Open a terminal and issue those commands:
 
 ## Windows installation
 
+This is an experimental feature.
+
 Tested on Windows XP SP3.
 
 Download and install [Ruby](http://rubyforge.org/frs/download.php/29263/ruby186-26.exe).
 
-Start a command prompt, Start -> Run -> cmd and press return
+After the installation completes, start a command prompt, Start -> Run -> cmd and press return.
 
 Issue those commands to update rubygems:
 
