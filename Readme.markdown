@@ -33,7 +33,9 @@ You can also use another last.fm username and try to import the loved tracks of 
 
 ## Mac OS X installation
 
-Tested on Snow Leopard.
+Tested on Snow Leopard with iTunes:
+- 8.2.6
+- 9.0
 
 Two rubygems are required in order to run loved2itunes, nokogiri and rb-appscript.
 
@@ -42,41 +44,25 @@ Open a terminal and issue those commands:
     sudo gem install nokogiri --no-rdoc --no-ri
     sudo gem install rb-appscript --no-rdoc --no-ri
 
+Run the script as described above.
+
 ## Windows installation
 
 This is an experimental feature.
 
-Tested on Windows XP SP3.
+Tested on Windows XP SP3 with iTunes:
+- 8.2.6
 
 Download and install [Ruby](http://rubyforge.org/frs/download.php/29263/ruby186-26.exe).
 
-After the installation completes, start a command prompt, Start -> Run -> cmd and press return.
+After the installation completes, start a command prompt, Start -> Run -> write cmd and press return.
 
 Issue those commands to update rubygems:
 
-    Z:\src\loved2itunes>gem update --system
-    Updating RubyGems...
-    Attempting remote update of rubygems-update
-    Install required dependency builder? [Yn]  y
-    Install required dependency session? [Yn]  y
-    Install required dependency hoe-seattlerb? [Yn]  y
-    Install required dependency hoe? [Yn]  y
-    Install required dependency rubyforge? [Yn]  y
-    Install required dependency rake? [Yn]  y
-    Install required dependency minitest? [Yn]  y
-    Install required dependency hoe? [Yn]  y
-    Successfully installed rubygems-update-1.3.5
-    Successfully installed builder-2.1.2
-    Successfully installed session-2.4.0
-    Successfully installed hoe-seattlerb-1.2.1
-    Successfully installed hoe-2.3.3
-    Successfully installed rubyforge-1.0.4
-    Successfully installed rake-0.8.7
-    Successfully installed minitest-1.4.2
-    Successfully installed hoe-2.3.3
+    gem update --system
 
 Then install the required gem:
 
-    Z:\src\loved2itunes>gem install nokogiri --no-rdoc --no-ri
-    Successfully installed nokogiri-1.3.3-x86-mswin32
-    1 gem installed
+    gem install nokogiri --no-rdoc --no-ri
+
+Run the script as described above.
