@@ -100,7 +100,7 @@ begin
     doc = Nokogiri::XML(open(url))
     loved_tracks = (doc/'//lovedtracks/track') # XPath selection.
 
-    if PLATFORM =~ /darwin/
+    if RUBY_PLATFORM =~ /darwin/
       # Operating on Macintosh.
       iTunes = Appscript.app("iTunes.app") # get iTunes reference.
       iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
